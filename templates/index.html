@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChurnSense — Customer Churn Prediction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --surface2: #1a2235;
+      --border: rgba(255,255,255,0.07);
+      --accent: #4f8ef7;
+      --accent2: #a78bfa;
+      --danger: #f87171;
+      --success: #34d399;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --glow: rgba(79,142,247,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(79,142,247,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(167,139,250,0.10) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grid texture */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 52px;
+      animation: fadeDown 0.7s ease both;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(79,142,247,0.12);
+      border: 1px solid rgba(79,142,247,0.3);
+      color: var(--accent);
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 14px;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 300;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Form Card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 32px 80px rgba(0,0,0,0.4);
+      animation: fadeUp 0.7s 0.15s ease both;
+    }
+
+    .section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+    }
+
+    input, select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    input::placeholder { color: rgba(148,163,184,0.4); }
+
+    input:focus, select:focus {
+      border-color: rgba(79,142,247,0.5);
+      box-shadow: 0 0 0 3px rgba(79,142,247,0.12);
+      background: rgba(26,34,53,0.9);
+    }
+
+    input:hover, select:hover {
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    /* Submit button */
+    .btn-predict {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 32px rgba(79,142,247,0.3);
+    }
+
+    .btn-predict::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn-predict:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(79,142,247,0.4);
+    }
+
+    .btn-predict:hover::before { opacity: 1; }
+    .btn-predict:active { transform: translateY(0); }
+
+    .btn-predict span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Info footer */
+    .info-bar {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .info-item svg { opacity: 0.6; }
+
+    /* Animations */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Glossary */
+    .glossary {
+      margin-top: 36px;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+
+    .glossary-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .glossary-title::before, .glossary-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+    }
+
+    .glossary-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+
+    .glossary-item:hover {
+      border-color: rgba(79,142,247,0.25);
+    }
+
+    .glossary-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(79,142,247,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+
+    .glossary-text .term {
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .glossary-text .desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .card { padding: 24px; }
+      .glossary-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 400px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="badge">AI-Powered Analytics</div>
+      <h1>ChurnSense</h1>
+      <p>Predict customer churn probability using machine learning. Fill in customer details below to get an instant prediction.</p>
+    </header>
+
+    <div class="card">
+      <form action="{{ url_for('index_page') }}" method="post" enctype="application/x-www-form-urlencoded">
+
+        <div class="section-label">Personal Info</div>
+        <div class="grid">
+          <div class="field">
+            <label for="Tenure">Tenure (months)</label>
+            <input type="number" id="Tenure" name="Tenure" placeholder="e.g. 12" min="0" required>
+          </div>
+          <div class="field">
+            <label for="Citytier">City Tier</label>
+            <select id="Citytier" name="Citytier" required>
+              <option value="" disabled selected>Select tier</option>
+              <option value="1">Tier 1</option>
+              <option value="2">Tier 2</option>
+              <option value="3">Tier 3</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="Gender">Gender</label>
+            <select id="Gender" name="Gender" required>
+              <option value="" disabled selected>Select gender</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="Maritalstatus">Marital Status</label>
+            <select id="Maritalstatus" name="Maritalstatus" required>
+              <option value="" disabled selected>Select status</option>
+              <option value="divorced">Divorced</option>
+              <option value="married">Married</option>
+              <option value="single">Single</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-label">App & Device Usage</div>
+        <div class="grid">
+          <div class="field">
+            <label for="Hourspendonapp">Hours Spent on App</label>
+            <input type="number" id="Hourspendonapp" name="Hourspendonapp" placeholder="e.g. 3" min="0" required>
+          </div>
+          <div class="field">
+            <label for="Numberofdeviceregistered">Devices Registered</label>
+            <input type="number" id="Numberofdeviceregistered" name="Numberofdeviceregistered" placeholder="e.g. 2" min="0" required>
+          </div>
+          <div class="field">
+            <label for="Numberofaddress">Number of Addresses</label>
+            <input type="number" id="Numberofaddress" name="Numberofaddress" placeholder="e.g. 1" min="0" required>
+          </div>
+          <div class="field">
+            <label for="Warehousetohome">Warehouse to Home (km)</label>
+            <input type="number" id="Warehousetohome" name="Warehousetohome" placeholder="e.g. 15" min="0" required>
+          </div>
+        </div>
+
+        <div class="section-label">Order & Transaction</div>
+        <div class="grid">
+          <div class="field">
+            <label for="Ordercount">Order Count</label>
+            <input type="number" id="Ordercount" name="Ordercount" placeholder="e.g. 8" min="0" required>
+          </div>
+          <div class="field">
+            <label for="Daysincelastorder">Days Since Last Order</label>
+            <input type="number" id="Daysincelastorder" name="Daysincelastorder" placeholder="e.g. 5" min="0" required>
+          </div>
+          <div class="field">
+            <label for="Orderamounthikefromlastyear">Order Hike from Last Year (%)</label>
+            <input type="number" id="Orderamounthikefromlastyear" name="Orderamounthikefromlastyear" placeholder="e.g. 15" min="0" required>
+          </div>
+          <div class="field">
+            <label for="Couponused">Coupons Used</label>
+            <input type="number" id="Couponused" name="Couponused" placeholder="e.g. 3" min="0" required>
+          </div>
+        </div>
+
+        <div class="section-label">Satisfaction & Feedback</div>
+        <div class="grid">
+          <div class="field">
+            <label for="Satisfactionscore">Satisfaction Score (1–5)</label>
+            <input type="number" id="Satisfactionscore" name="Satisfactionscore" placeholder="1–5" min="1" max="5" required>
+          </div>
+          <div class="field">
+            <label for="Complain">Complaints Filed</label>
+            <input type="number" id="Complain" name="Complain" placeholder="0 or 1" min="0" max="1" required>
+          </div>
+          <div class="field">
+            <label for="Cashbackamount">Cashback Amount (IDR)</label>
+            <input type="number" id="Cashbackamount" name="Cashbackamount" placeholder="e.g. 200" min="0" required>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <button type="submit" class="btn-predict">
+          <span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Run Prediction
+          </span>
+        </button>
+
+        <div class="info-bar">
+          <div class="info-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Real-time inference
+          </div>
+          <div class="info-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            XGBoost model
+          </div>
+          <div class="info-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            15 features analyzed
+          </div>
+        </div>
+      </form>
+    </div>
+    <!-- Glossary -->
+    <div class="glossary">
+      <div class="glossary-title">Panduan Pengisian Field</div>
+      <div class="glossary-grid">
+
+        <div class="glossary-item">
+          <div class="glossary-icon">📅</div>
+          <div class="glossary-text">
+            <div class="term">Tenure</div>
+            <div class="desc">Lama waktu pelanggan telah bergabung dengan platform e-commerce, dihitung dalam <strong>bulan</strong>. Semakin tinggi, semakin lama pelanggan tersebut aktif.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">🏙️</div>
+          <div class="glossary-text">
+            <div class="term">City Tier</div>
+            <div class="desc">Klasifikasi kota tempat tinggal pelanggan. <strong>Tier 1</strong> = kota besar (Jakarta, Surabaya). <strong>Tier 2</strong> = kota menengah. <strong>Tier 3</strong> = kota kecil / kabupaten.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">🏭</div>
+          <div class="glossary-text">
+            <div class="term">Warehouse to Home</div>
+            <div class="desc">Jarak antara gudang terdekat ke rumah pelanggan dalam satuan <strong>kilometer</strong>. Berpengaruh pada kecepatan pengiriman.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">📱</div>
+          <div class="glossary-text">
+            <div class="term">Hours Spent on App</div>
+            <div class="desc">Rata-rata jumlah <strong>jam per hari</strong> yang dihabiskan pelanggan menggunakan aplikasi e-commerce.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">💻</div>
+          <div class="glossary-text">
+            <div class="term">Devices Registered</div>
+            <div class="desc">Jumlah perangkat (HP, laptop, tablet) yang terdaftar pada akun pelanggan. Menunjukkan tingkat keterlibatan pelanggan.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">📍</div>
+          <div class="glossary-text">
+            <div class="term">Number of Addresses</div>
+            <div class="desc">Jumlah alamat pengiriman yang tersimpan di akun pelanggan. Bisa mencerminkan seberapa sering pelanggan berbelanja untuk berbagai lokasi.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">⭐</div>
+          <div class="glossary-text">
+            <div class="term">Satisfaction Score</div>
+            <div class="desc">Skor kepuasan pelanggan terhadap layanan, skala <strong>1 sampai 5</strong>. Nilai 1 = sangat tidak puas, nilai 5 = sangat puas.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">📦</div>
+          <div class="glossary-text">
+            <div class="term">Order Count</div>
+            <div class="desc">Total jumlah pesanan yang pernah dilakukan pelanggan sejak bergabung. Semakin banyak, semakin aktif pelanggan tersebut berbelanja.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">🕐</div>
+          <div class="glossary-text">
+            <div class="term">Days Since Last Order</div>
+            <div class="desc">Jumlah <strong>hari</strong> sejak pesanan terakhir pelanggan. Nilai tinggi menandakan pelanggan sudah lama tidak berbelanja.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">📈</div>
+          <div class="glossary-text">
+            <div class="term">Order Hike from Last Year</div>
+            <div class="desc">Persentase kenaikan nilai pesanan dibandingkan tahun lalu (dalam <strong>%</strong>). Angka positif berarti belanja meningkat.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">🎟️</div>
+          <div class="glossary-text">
+            <div class="term">Coupons Used</div>
+            <div class="desc">Total jumlah kupon diskon yang pernah digunakan pelanggan. Menunjukkan kepekaan pelanggan terhadap promo.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">😤</div>
+          <div class="glossary-text">
+            <div class="term">Complaints Filed</div>
+            <div class="desc">Apakah pelanggan pernah mengajukan komplain? Isi <strong>1</strong> jika pernah komplain, <strong>0</strong> jika tidak pernah.</div>
+          </div>
+        </div>
+
+        <div class="glossary-item">
+          <div class="glossary-icon">💰</div>
+          <div class="glossary-text">
+            <div class="term">Cashback Amount</div>
+            <div class="desc">Total cashback yang diterima pelanggan dari transaksi belanja. Biasanya dalam satuan mata uang lokal.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

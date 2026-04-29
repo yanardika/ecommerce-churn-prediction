@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChurnSense | Predict Customer Churn Before It Happens</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #06090f;
+      --surface: #0d1117;
+      --surface2: #161b27;
+      --surface3: #1e2535;
+      --border: rgba(255,255,255,0.06);
+      --border2: rgba(255,255,255,0.1);
+      --accent: #4f8ef7;
+      --accent2: #818cf8;
+      --success: #34d399;
+      --danger: #f87171;
+      --amber: #fbbf24;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(6,9,15,0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-logo-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted2);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: white !important;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-weight: 500 !important;
+      font-size: 14px !important;
+      transition: opacity 0.2s, transform 0.2s !important;
+    }
+
+    .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); color: white !important; }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(79,142,247,0.14) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(129,140,248,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    .hero-inner { position: relative; z-index: 1; max-width: 760px; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(79,142,247,0.1);
+      border: 1px solid rgba(79,142,247,0.25);
+      color: #93c5fd;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    h1.hero-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(38px, 6vw, 68px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      margin-bottom: 22px;
+      animation: fadeDown 0.6s 0.1s ease both;
+    }
+
+    .hero-title .highlight {
+      background: linear-gradient(135deg, #4f8ef7, #818cf8, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted2);
+      font-weight: 300;
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+      animation: fadeDown 0.6s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeDown 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--accent), #6366f1);
+      color: white;
+      border-radius: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 32px rgba(79,142,247,0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(79,142,247,0.4);
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: transparent;
+      color: var(--muted2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .btn-outline:hover {
+      border-color: rgba(255,255,255,0.2);
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* Hero mockup card */
+    .hero-mockup {
+      margin-top: 64px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.8s 0.4s ease both;
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .mockup-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .mockup-bar {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #f87171; }
+    .dot-y { background: #fbbf24; }
+    .dot-g { background: #34d399; }
+
+    .mockup-url {
+      flex: 1;
+      background: var(--surface3);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 12px;
+    }
+
+    .mockup-body {
+      padding: 28px 28px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.3px; }
+    .stat-val { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 700; }
+    .stat-val.danger { color: var(--danger); }
+    .stat-val.success { color: var(--success); }
+    .stat-val.accent { color: var(--accent); }
+
+    .stat-trend {
+      font-size: 11px;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .trend-up { color: var(--danger); }
+    .trend-down { color: var(--success); }
+
+    .mockup-result {
+      margin: 0 28px 28px;
+      background: linear-gradient(135deg, rgba(248,113,113,0.08), rgba(248,113,113,0.04));
+      border: 1px solid rgba(248,113,113,0.2);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .result-label { font-size: 13px; color: var(--muted2); }
+    .result-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--danger); }
+
+    .prob-bar-wrap { flex: 1; margin: 0 16px; }
+    .prob-bar-track { height: 6px; background: var(--surface3); border-radius: 100px; overflow: hidden; }
+    .prob-bar-fill { height: 100%; width: 73%; background: linear-gradient(90deg, #f87171, #fb923c); border-radius: 100px; }
+
+    /* ─── STATS SECTION ─── */
+    section { padding: 96px 24px; }
+
+    .container { max-width: 1040px; margin: 0 auto; }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      color: var(--muted2);
+      font-size: 16px;
+      font-weight: 300;
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 56px;
+    }
+
+    /* Stats numbers */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .stat-box {
+      background: var(--surface);
+      padding: 36px 28px;
+      text-align: center;
+    }
+
+    .stat-box-num {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--text), var(--muted2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .stat-box-label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ─── FEATURES ─── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(79,142,247,0.2);
+      transform: translateY(-3px);
+    }
+
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      font-size: 20px;
+    }
+
+    .feature-icon.blue { background: rgba(79,142,247,0.12); }
+    .feature-icon.purple { background: rgba(167,139,250,0.12); }
+    .feature-icon.green { background: rgba(52,211,153,0.12); }
+    .feature-icon.amber { background: rgba(251,191,36,0.12); }
+    .feature-icon.red { background: rgba(248,113,113,0.12); }
+    .feature-icon.teal { background: rgba(45,212,191,0.12); }
+
+    .feature-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 13px;
+      color: var(--muted2);
+      line-height: 1.65;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .steps { display: flex; flex-direction: column; gap: 4px; }
+
+    .step {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      transition: background 0.2s;
+      cursor: default;
+    }
+
+    .step:hover { background: var(--surface2); }
+
+    .step-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(79,142,247,0.12);
+      border: 1px solid rgba(79,142,247,0.25);
+      color: var(--accent);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .step-desc { font-size: 13px; color: var(--muted2); line-height: 1.6; }
+
+    /* Pipeline visual */
+    .pipeline {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .pipeline-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .pipe-step {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .pipe-badge {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .pipe-badge.done { background: rgba(52,211,153,0.15); color: var(--success); }
+    .pipe-badge.active { background: rgba(79,142,247,0.15); color: var(--accent); }
+
+    .pipe-arrow {
+      text-align: center;
+      color: var(--muted);
+      font-size: 16px;
+      margin: 2px 0;
+    }
+
+    .pipe-result {
+      background: linear-gradient(135deg, rgba(79,142,247,0.08), rgba(129,140,248,0.06));
+      border: 1px solid rgba(79,142,247,0.2);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .pipe-result-label { font-size: 12px; color: var(--muted2); }
+    .pipe-result-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 700; color: var(--accent); }
+
+    /* ─── CTA ─── */
+    .cta-section {
+      text-align: center;
+      padding: 96px 24px;
+      position: relative;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(79,142,247,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-box {
+      position: relative;
+      z-index: 1;
+      max-width: 580px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      padding: 56px 48px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+    }
+
+    .cta-box h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+    }
+
+    .cta-box p {
+      color: var(--muted2);
+      font-size: 15px;
+      margin-bottom: 32px;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .footer-note { font-size: 13px; color: var(--muted); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* ─── DIVIDER ─── */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .how-wrap { grid-template-columns: 1fr; }
+      .mockup-body { grid-template-columns: 1fr 1fr; }
+      .cta-box { padding: 36px 24px; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-dot"></div>
+      ChurnSense
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#stats">Dataset</a></li>
+      <li><a href="/predict" class="nav-cta">Try the App →</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        Powered by XGBoost · 15 Features
+      </div>
+      <h1 class="hero-title">
+        Predict Churn<br>
+        <span class="highlight">Before It Happens</span>
+      </h1>
+      <p class="hero-sub">
+        ChurnSense uses machine learning to identify e-commerce customers at risk of leaving.
+      </p>
+      <div class="hero-actions">
+        <a href="/predict" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Try Free Prediction
+        </a>
+        <a href="#how" class="btn-outline">
+          How it works
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Mockup preview -->
+    <div class="hero-mockup">
+      <div class="mockup-card">
+        <div class="mockup-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <div class="mockup-url">churnsense.app/predict</div>
+        </div>
+        <div class="mockup-body">
+          <div class="stat-card">
+            <div class="stat-label">Churn Rate</div>
+            <div class="stat-val danger">16.8%</div>
+            <div class="stat-trend trend-up">↑ +2.1% this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Accuracy</div>
+            <div class="stat-val accent">96.2%</div>
+            <div class="stat-trend trend-down">↑ XGBoost model</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Customers Analyzed</div>
+            <div class="stat-val success">5,630</div>
+            <div class="stat-trend" style="color: var(--muted);">E-Commerce dataset</div>
+          </div>
+        </div>
+        <div class="mockup-result">
+          <div>
+            <div class="result-label">Latest Prediction</div>
+            <div class="result-value">CHURN — 73%</div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-bar-track">
+              <div class="prob-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section id="stats" style="padding-top: 0;">
+    <div class="container">
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-box-num">5,630</div>
+          <div class="stat-box-label">Customers in dataset</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num">15</div>
+          <div class="stat-box-label">Features analyzed</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num">96.2%</div>
+          <div class="stat-box-label">Model accuracy</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num">16.8%</div>
+          <div class="stat-box-label">Dataset churn rate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="container">
+      <div class="section-tag">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Features
+      </div>
+      <h2 class="section-title">Everything you need to<br>reduce customer loss</h2>
+      <p class="section-sub">Built for data-driven e-commerce teams who want to understand customer behavior before it becomes a problem.</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon blue">⚡</div>
+          <div class="feature-title">Real-time Prediction</div>
+          <div class="feature-desc">Instant churn probability on any customer profile. Results in milliseconds using our pre-trained XGBoost model.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon purple">🧠</div>
+          <div class="feature-title">XGBoost Engine</div>
+          <div class="feature-desc">Industry-leading gradient boosting algorithm trained on 5,630 real e-commerce customer records for maximum accuracy.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon green">📊</div>
+          <div class="feature-title">15-Feature Analysis</div>
+          <div class="feature-desc">Analyzes tenure, satisfaction, order history, app usage, location tier, and more to generate a holistic risk score.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon amber">🎯</div>
+          <div class="feature-title">Probability Score</div>
+          <div class="feature-desc">Not just yes or no — get the exact churn probability with a visual meter so you can prioritize intervention efforts.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon red">🔔</div>
+          <div class="feature-title">Risk Classification</div>
+          <div class="feature-desc">Customers are automatically classified as Low, Medium, or High risk based on their probability score.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon teal">📋</div>
+          <div class="feature-title">Exportable Reports</div>
+          <div class="feature-desc">Save prediction results as a PDF report directly from the results page for documentation or team sharing.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="container">
+      <div class="how-wrap">
+        <div>
+          <div class="section-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            How it works
+          </div>
+          <h2 class="section-title">From input to<br>insight in 3 steps</h2>
+          <p class="section-sub" style="margin-bottom: 36px;">No data science background needed. Just fill in the customer details and let the model do the work.</p>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <div class="step-title">Fill Customer Profile</div>
+                <div class="step-desc">Enter 15 data points about the customer — from tenure and city tier to satisfaction score and order history.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <div class="step-title">Model Processes Features</div>
+                <div class="step-desc">The XGBoost model analyzes all features simultaneously, applying weights learned from thousands of historical records.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <div class="step-title">Get Prediction & Risk Score</div>
+                <div class="step-desc">Receive an instant verdict (Churn / Not Churn) along with exact probability and risk level classification.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline visual -->
+        <div class="pipeline">
+          <div class="pipeline-title">ML Pipeline</div>
+
+          <div class="pipe-step">
+            <div class="pipe-badge done">✓</div>
+            <div>
+              <div style="font-size: 13px; font-weight: 500;">Raw Input (15 features)</div>
+              <div style="font-size: 11px; color: var(--muted);">tenure, citytier, gender, ...</div>
+            </div>
+          </div>
+
+          <div class="pipe-arrow">↓</div>
+
+          <div class="pipe-step">
+            <div class="pipe-badge done">✓</div>
+            <div>
+              <div style="font-size: 13px; font-weight: 500;">Preprocessing</div>
+              <div style="font-size: 11px; color: var(--muted);">One-hot encoding · Imputation</div>
+            </div>
+          </div>
+
+          <div class="pipe-arrow">↓</div>
+
+          <div class="pipe-step">
+            <div class="pipe-badge done">✓</div>
+            <div>
+              <div style="font-size: 13px; font-weight: 500;">SMOTE Balancing</div>
+              <div style="font-size: 11px; color: var(--muted);">Handles class imbalance</div>
+            </div>
+          </div>
+
+          <div class="pipe-arrow">↓</div>
+
+          <div class="pipe-step">
+            <div class="pipe-badge active">→</div>
+            <div>
+              <div style="font-size: 13px; font-weight: 500;">XGBoost Classifier</div>
+              <div style="font-size: 11px; color: var(--muted);">Gradient boosting · 96.2% acc.</div>
+            </div>
+          </div>
+
+          <div class="pipe-arrow">↓</div>
+
+          <div class="pipe-result">
+            <div>
+              <div class="pipe-result-label">Output</div>
+              <div class="pipe-result-value">Churn Probability → 0.73</div>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f8ef7" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <div class="cta-box">
+      <h2>Ready to predict churn?</h2>
+      <p>Enter a customer's details and get an instant AI-powered churn prediction.</p>
+      <a href="/predict" class="btn-primary" style="display: inline-flex; margin: 0 auto;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Start Predicting Now
+      </a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">ChurnSense</div>
+    <div class="footer-note">Built with XGBoost · Flask · scikit-learn</div>
+  </footer>
+
+</body>
+</html>
