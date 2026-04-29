@@ -1,50 +1,49 @@
-# 🔮 ChurnSense — E-Commerce Customer Churn Prediction
+# ChurnSense | E-Commerce Customer Churn Prediction
 
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-2.x-000000?style=flat-square&logo=flask&logoColor=white)
-![XGBoost](https://img.shields.io/badge/XGBoost-1.7+-189B62?style=flat-square)
+![XGBoost](https://img.shields.io/badge/XGBoost-1.7+-23C376?style=flat-square&logo=xgboost&logoColor=white)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3+-F7931E?style=flat-square&logo=scikit-learn&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Complete-34d399?style=flat-square)
 
 A machine learning web application that predicts whether an e-commerce customer will churn, built as an end-to-end data science project — from exploratory data analysis to model deployment with a modern Flask web interface.
 
-> 🎯 **Learning Focus**: This project demonstrates the full ML lifecycle: EDA → Feature Engineering → Model Selection → Evaluation → Deployment.
+> **Learning Focus**: This project demonstrates the full ML lifecycle: EDA → Feature Engineering → Model Selection → Evaluation → Deployment.
 
 ---
 
-## 📸 Preview
+## Preview
 
 | Landing Page | Prediction Form | Result |
 |---|---|---|
-| ![landing](https://via.placeholder.com/280x160/0a0f1e/4f8ef7?text=Landing+Page) | ![form](https://via.placeholder.com/280x160/0a0f1e/4f8ef7?text=Prediction+Form) | ![result](https://via.placeholder.com/280x160/0a0f1e/34d399?text=Result+Page) |
+| ![landing](assets/landing.png) | ![form](assets/form.png) | ![result](assets/result.png) |
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 churnsense/
 │
-├── app.py                          # Flask application & routing
-├── requirements.txt                # Python dependencies
-├── E Commerce Dataset.xlsx         # Raw dataset
+├── app.py                          
+├── requirements.txt              
+├── E Commerce Dataset.xlsx       
 │
 ├── templates/
-│   ├── landing.html                # SaaS-style landing page
-│   ├── index.html                  # Prediction form with field glossary
-│   └── result.html                 # Prediction result with probability meter
+│   ├── landing.html                
+│   ├── index.html                  
+│   └── result.html                 
 │
 ├── models/
-│   ├── churn_prediction_model.pkl  # Trained XGBoost model
-│   └── columns.json                # Feature column names
+│   ├── churn_prediction_model.pkl  
+│   └── columns.json                
 │
 └── notebook/
-    └── ecommerce_customer_churn_prediction.ipynb  # Full EDA & modeling notebook
+    └── ecommerce_customer_churn_prediction.ipynb  
 ```
 
 ---
 
-## 🧠 What This Project Covers
+## What This Project Covers
 
 ### 1. Exploratory Data Analysis (EDA)
 - Distribution plots for all categorical and numerical features
@@ -69,7 +68,7 @@ Models compared using 5-fold cross-validation:
 | KNN | 88.4% | 87.9% | 86.1% | 87.0% |
 | AdaBoost | 90.2% | 89.6% | 87.8% | 88.7% |
 
-> ✅ **XGBoost** selected as final model for highest overall performance.
+> **XGBoost** selected as final model for highest overall performance.
 
 ### 4. Feature Importance
 Top features by XGBoost gain score:
@@ -86,7 +85,7 @@ Top features by XGBoost gain score:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -101,7 +100,7 @@ Top features by XGBoost gain score:
 
 ---
 
-## 🚀 How to Run Locally
+## How to Run Locally
 
 ### 1. Clone the repository
 ```bash
@@ -137,7 +136,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 📊 Dataset Info
+## Dataset Info
 
 | Property | Value |
 |---|---|
@@ -169,7 +168,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 🎯 Key Learnings
+## Key Learnings
 
 - **SMOTE** significantly improved recall for the minority class (churners) from ~72% to ~94%
 - **XGBoost** outperforms linear models because churn behavior is non-linear
@@ -178,7 +177,7 @@ http://127.0.0.1:5000
 
 ---
 
-## 📦 Requirements
+## Requirements
 
 ```
 flask
@@ -197,18 +196,15 @@ jupyter
 
 ---
 
-## 👤 Author
+## License
 
-**[Your Name]**
-- GitHub: [@your_username](https://github.com/your_username)
-- LinkedIn: [your-linkedin](https://linkedin.com/in/your-linkedin)
+This project is built for portfolio and learning purposes. The dataset comes from [Kaggle](https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction).
 
 ---
 
-## 📄 License
+## Author
 
-This project is open source and available under the [MIT License](LICENSE).
+**Yan Andhinaya Ardika**
+- GitHub: [yanardika](https://github.com/yanardika)
 
 ---
-
-<p align="center">Built with ❤️ for learning end-to-end machine learning deployment</p>
