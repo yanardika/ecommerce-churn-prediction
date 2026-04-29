@@ -10,10 +10,10 @@ def churn_prediction(tenure, citytier, warehousetohome, gender, hourspendonapp,
                      numberofaddress, complain, orderamounthikefromlastyear,
                      couponused, ordercount, daysincelastorder, cashbackamount):
 
-    with open('notebook/models/churn_prediction_model.pkl', 'rb') as f:
+    with open('models/churn_prediction_model.pkl', 'rb') as f:
         model = pickle.load(f)
 
-    with open('notebook/models/columns.json', 'r') as f:
+    with open('models/columns.json', 'r') as f:
         data_columns = json.load(f)['data_columns']
 
     input_dict = {
