@@ -196,7 +196,7 @@ jupyter
 
 ---
 
-## License
+## Disclaimer
 
 This project is built for portfolio and learning purposes. The dataset comes from [Kaggle](https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction).
 
