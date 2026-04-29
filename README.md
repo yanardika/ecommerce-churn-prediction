@@ -22,7 +22,7 @@ A machine learning web application that predicts whether an e-commerce customer 
 ## Project Structure
 
 ```
-churnsense/
+ecommerce-churn-prediction/
 │
 ├── app.py                          
 ├── requirements.txt              
