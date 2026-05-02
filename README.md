@@ -59,7 +59,7 @@ ecommerce-churn-prediction/
 ### 3. Model Selection & Evaluation
 Models compared using 5-fold cross-validation:
 
-![Comparison Model][assets/compare_model.png]
+![Comparison Model](assets/compare_model.png)
 
 Final Model Comparison
 | Model Name | Accuracy |
