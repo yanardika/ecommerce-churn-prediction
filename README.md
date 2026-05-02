@@ -59,14 +59,13 @@ ecommerce-churn-prediction/
 ### 3. Model Selection & Evaluation
 Models compared using 5-fold cross-validation:
 
-| Model | Accuracy | Precision | Recall | F1 |
-|---|---|---|---|---|
-| **XGBoost** | **96.2%** | **95.8%** | **94.1%** | **94.9%** |
-| Random Forest | 95.1% | 94.3% | 92.7% | 93.4% |
-| Gradient Boosting | 93.8% | 93.1% | 91.2% | 92.1% |
-| Logistic Regression | 82.3% | 81.7% | 79.4% | 80.5% |
-| KNN | 88.4% | 87.9% | 86.1% | 87.0% |
-| AdaBoost | 90.2% | 89.6% | 87.8% | 88.7% |
+![Comparison Model][assets/compare_model.png]
+
+Final Model Comparison
+| Model Name | Accuracy |
+|---|---|
+| Random Forest | 0.9662522202486679 |
+| XGBoost | 0.9769094138543517 |
 
 > **XGBoost** selected as final model for highest overall performance.
 
